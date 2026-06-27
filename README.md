@@ -1,6 +1,7 @@
 # Lumière
 
-A modern, feature-rich Flutter e-commerce application built with a clean, feature-first architecture. Lumière provides a seamless shopping experience with an elegant onboarding flow, product discovery, and detailed product views.
+A Flutter fashion e-commerce application built with a clean, feature-first architecture. Lumière provides a seamless shopping experience with an onboarding flow, product discovery, and detailed product views.
+Inspired by the UI and micro-interactions of the curated concept on [Dribbble](https://dribbble.com/shots/24747396-Lumi-re-Fashion-mobile-app).
 
 ## Features
 
@@ -60,6 +61,10 @@ flutter build appbundle --release
 flutter build ios --release
 
 ```
+
+## Android APK download:
+[Download]( )
+
 
 ## Project Architecture
 
