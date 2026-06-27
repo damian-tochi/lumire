@@ -63,7 +63,7 @@ flutter build ios --release
 ```
 
 ## Android APK download:
-[Download]( )
+[Download](https://drive.google.com/file/d/1sZ0r0ZH7xN0aB9KbZ8N-9o9VovTj802o/view?usp=sharing)
 
 
 ## Project Architecture
