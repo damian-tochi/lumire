@@ -20,10 +20,22 @@ class ShopDiscoveryScreen extends StatefulWidget {
 class _ShopDiscoveryScreenState extends State<ShopDiscoveryScreen> {
   String selectedCategory = AppStrings.trending;
 
-  // Track liked items by index to demonstrate dynamic color changing from screens 2 & 3
-  final Set<int> likedProductIndices = {
-    0,
-  }; // Pre-populating index 0 liked based on image 2
+  final Set<int> likedProductIndices = {0};
+
+  double _screenScale = 1.0;
+
+  void _triggerQuickPopAnimation() async {
+    setState(() => _screenScale = 0.99);
+    await Future.delayed(const Duration(milliseconds: 80));
+    setState(() => _screenScale = 1.0);
+    Navigator.push(context, FadePageRoute(page: const ProductDetailScreen()));
+  }
+
+  void _triggerQuickPopAnimationBtn() async {
+    setState(() => _screenScale = 0.99);
+    await Future.delayed(const Duration(milliseconds: 90));
+    setState(() => _screenScale = 1.0);
+  }
 
   final List<String> categories = [
     AppStrings.trending,
@@ -67,7 +79,7 @@ class _ShopDiscoveryScreenState extends State<ShopDiscoveryScreen> {
   @override
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
-    const Color headerColor = AppColors.backgroundCream;
+    const Color headerColor = AppColors.textWhite;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -77,153 +89,196 @@ class _ShopDiscoveryScreenState extends State<ShopDiscoveryScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.backgroundBlack,
-        body: Column(
-          children: [
-            // 1. EXTENDED TOP HEADER PANEL
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 8,
-                bottom: 16,
-                left: 16,
-                right: 16,
-              ),
-              decoration: const BoxDecoration(
-                color: headerColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Icon(Icons.notes, color: AppColors.textPrimary, size: 28),
-                      Text(
-                        AppStrings.appName,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+        body: Container(
+          color: Colors.black,
+          child: AnimatedScale(
+            scale: _screenScale,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOutBack,
+            child: Column(
+              children: [
+                // 1. EXTENDED TOP HEADER PANEL
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 8,
+                    bottom: 16,
+                    left: 16,
+                    right: 16,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: headerColor,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            clipBehavior: Clip.antiAlias,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
+                              color: AppColors.backgroundLightCream,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notes,
+                              color: AppColors.textPrimary,
+                              size: 20,
+                            ),
+                          ),
+                          const Text(
+                            AppStrings.appName,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Container(
+                            clipBehavior: Clip.antiAlias,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
+                              color: AppColors.backgroundLightCream,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.shopping_bag_outlined, color: AppColors.textPrimary, size: 20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 25),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.backgroundLightCream,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: AppColors.backgroundLightCream,
+                          ),
+                        ),
+                        child: Row(
+                          children: const [
+                            Icon(
+                              Icons.search,
+                              color: AppColors.textPrimary,
+                              size: 20,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              AppStrings.searchHint,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Icon(Icons.shopping_bag_outlined, color: AppColors.textPrimary, size: 28),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
+                ),
+
+                const SizedBox(height: 4),
+
+                // 2. MAIN APP CONTENT CONTAINER (STAGGERED DUAL COLUMN LIST)
+                Expanded(
+                  child: Container(
+                    clipBehavior: Clip.antiAlias,
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                    decoration: const BoxDecoration(
                       color: AppColors.textWhite,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.borderLighter),
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
                     ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.search, color: AppColors.textTertiary, size: 22),
-                        SizedBox(width: 10),
-                        Text(
-                          AppStrings.searchHint,
-                          style: TextStyle(color: AppColors.textTertiary, fontSize: 14),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0.0, end: 1.0),
+                            duration: const Duration(seconds: 1),
+                            curve: Curves.easeIn,
+                            builder: (context, opacityValue, child) {
+                              return Opacity(
+                                opacity: opacityValue,
+                                child: child,
+                              );
+                            },
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categories.length,
+                              itemBuilder: (context, index) {
+                                final cat = categories[index];
+                                final isSelected = cat == selectedCategory;
+                                return CategoryChip(
+                                  label: cat,
+                                  isSelected: isSelected,
+                                  onTap: () =>
+                                      setState(() => selectedCategory = cat),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // Product Grid Viewport
+                        Expanded(
+                          child: ShaderMask(
+                            blendMode: BlendMode.dstIn,
+                            shaderCallback: (Rect bounds) {
+                              return const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.transparent, Colors.black],
+                                stops: [0.0, 0.04],
+                              ).createShader(bounds);
+                            },
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 16.0,
+                                  top: 12,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Left Column Items (Index 0 and 2)
+                                    Expanded(
+                                      child: _buildProductColumn([0, 2]),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    // Right Column Items (Index 1 and 3)
+                                    Expanded(
+                                      child: _buildProductColumn([1, 3]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            // 2. MAIN APP CONTENT CONTAINER (STAGGERED DUAL COLUMN LIST)
-            Expanded(
-              child: Container(
-                clipBehavior: Clip.antiAlias,
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                decoration: const BoxDecoration(
-                  color: AppColors.backgroundCream,
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 40,
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0.0, end: 1.0),
-                        duration: const Duration(seconds: 1),
-                        curve: Curves.easeIn,
-                        builder: (context, opacityValue, child) {
-                          return Opacity(
-                            opacity: opacityValue,
-                            child: child,
-                          );
-                        },
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final cat = categories[index];
-                            final isSelected = cat == selectedCategory;
-                            return CategoryChip(
-                              label: cat,
-                              isSelected: isSelected,
-                              onTap: () => setState(() => selectedCategory = cat),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 10),
+                const SizedBox(height: 4),
 
-                    // Product Grid Viewport
-                    Expanded(
-                      child: ShaderMask(
-                        blendMode: BlendMode.dstIn,
-                        shaderCallback: (Rect bounds) {
-                          return const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black,
-                            ],
-                            stops: [
-                              0.0,
-                              0.04,
-                            ],
-                          ).createShader(bounds);
-                        },
-                        child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0, top: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Left Column Items (Index 0 and 2)
-                              Expanded(child: _buildProductColumn([0, 2])),
-                              const SizedBox(width: 14),
-                              // Right Column Items (Index 1 and 3)
-                              Expanded(child: _buildProductColumn([1, 3])),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),),
-                  ],
-                ),
-              ),
+                // 3. BOTTOM UTILITY NAVIGATION BAR
+                BottomNavBar(bottomPadding: bottomPadding),
+                SizedBox(height: bottomPadding > 0 ? 0 : 8),
+              ],
             ),
-
-            const SizedBox(height: 4),
-
-            // 3. BOTTOM UTILITY NAVIGATION BAR
-            BottomNavBar(bottomPadding: bottomPadding),
-            SizedBox(height: bottomPadding > 0 ? 0 : 8),
-          ],
+          ),
         ),
       ),
     );
@@ -241,13 +296,11 @@ class _ShopDiscoveryScreenState extends State<ShopDiscoveryScreen> {
             product: prod,
             isLiked: isLiked,
             onTap: () {
-              Navigator.push(
-                context,
-                FadePageRoute(page: const ProductDetailScreen()),
-              );
+              _triggerQuickPopAnimation();
             },
             onFavoriteToggle: () {
               setState(() {
+                _triggerQuickPopAnimationBtn();
                 if (isLiked) {
                   likedProductIndices.remove(index);
                 } else {

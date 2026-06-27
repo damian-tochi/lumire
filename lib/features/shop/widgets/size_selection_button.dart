@@ -72,7 +72,7 @@ class _SizeSelectionButtonState extends State<SizeSelectionButton>
                 border: Border.all(
                   color: widget.isSelected
                       ? AppColors.backgroundBlack
-                      : AppColors.borderSubtle,
+                      : AppColors.borderLighter,
                 ),
               ),
               alignment: Alignment.center,

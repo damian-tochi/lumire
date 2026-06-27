@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Backgrounds
   static const Color backgroundBlack = Colors.black;
-  static const Color backgroundCream = Color(0xFFFAF9F0);
-  static const Color backgroundLightCream = Color(0xFFFCFBE3);
+  static const Color backgroundCream = Color(0xFFFCFBE3);
+  // static const Color backgroundLightCream = Color(0xFFFCFBE3);
+  static const Color backgroundLightCream = Color(0xFFFAF9F0);
   static const Color backgroundGray = Color(0xFFEAEAEA);
 
   // Accent

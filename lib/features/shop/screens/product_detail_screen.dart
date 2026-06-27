@@ -33,11 +33,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     // Alternate profile 2
   ];
 
+  double _screenScale = 1.0;
+
+  void _triggerQuickPopAnimation() async {
+    setState(() => _screenScale = 0.99);
+    await Future.delayed(const Duration(milliseconds: 90));
+    setState(() => _screenScale = 1.0);
+  }
+
+  void _triggerQuickPopAnimationClose() async {
+    setState(() => _screenScale = 0.98);
+    await Future.delayed(const Duration(milliseconds: 70));
+    setState(() => _screenScale = 1.0);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    const Color headerColor = AppColors.backgroundCream;
+    const Color headerColor = AppColors.textWhite;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -47,250 +62,297 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.backgroundBlack,
-        body: Column(
-          children: [
-            // 1. EXTENDED TOP HEADER PANEL
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 20,
-                bottom: 30,
-                left: 16,
-                right: 16,
-              ),
-              decoration: const BoxDecoration(
-                color: headerColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.textPrimary,
-                      size: 26,
+        body: Container(
+          color: Colors.black,
+          child: AnimatedScale(
+            scale: _screenScale,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOutBack,
+            // Creates an organic tactile bounce effect
+            child: Column(
+              children: [
+                // 1. EXTENDED TOP HEADER PANEL
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 20,
+                    bottom: 30,
+                    left: 16,
+                    right: 16,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: headerColor,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
                     ),
                   ),
-                  const Text(
-                    AppStrings.productTitle,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.shopping_bag_outlined,
-                    color: AppColors.textPrimary,
-                    size: 26,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            // 2. PRODUCT GALLERY CONTAINER (With right thumbnail rail)
-            Expanded(
-              flex: 11,
-              child: Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(
-                  color: AppColors.backgroundCream,
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
-                ),
-                child: Stack(
-                  children: [
-                    // 1. MAIN ACTIVE IMAGE VIEWPORT
-                    Positioned.fill(
-                      child: AnimateInItem(
-                        index: 0,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 700),
-                          switchInCurve: Curves.ease,
-                          switchOutCurve: Curves.ease,
-                          layoutBuilder: (currentChild, previousChildren) {
-                            return Stack(
-                              children: [
-                                ...previousChildren,
-                                if (currentChild != null) Positioned.fill(child: currentChild),
-                              ],
-                            );
-                          },
-                          transitionBuilder: (Widget child, Animation<double> animation) {
-                            final isIncoming = child.key == ValueKey<int>(selectedImageIndex);
-
-                            final slideTween = isIncoming
-                                ? const Offset(-1.0, 0.0)
-                                : const Offset(1.0, 0.0);
-
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: slideTween,
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Image.network(
-                            productImages[selectedImageIndex],
-                            key: ValueKey<int>(selectedImageIndex),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // 2. VERTICAL THUMBNAIL RAIL
-                    Positioned(
-                      top: 0,
-                      right: 10,
-                      bottom: 0,
-                      width: 60,
-                      child: ListView.builder(
-                        itemCount: productImages.length,
-                        padding: const EdgeInsets.only(top: 8, bottom: 8),
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final isCurrent = index == selectedImageIndex;
-                          return ImageSelectionButton(isSelected: isCurrent, onTap: () { if (index != selectedImageIndex) {
-                            setState(() => selectedImageIndex = index);
-                          } }, imgLink: productImages[index],);
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _triggerQuickPopAnimationClose();
                         },
+                        child: Container(
+                          clipBehavior: Clip.antiAlias,
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                            color: AppColors.backgroundLightCream,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: AppColors.textPrimary,
+                            size: 20,
+                          ),
+                        ),
                       ),
+                      const Text(
+                        AppStrings.productTitle,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Container(
+                        clipBehavior: Clip.antiAlias,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: const BoxDecoration(
+                          color: AppColors.backgroundLightCream,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.shopping_bag_outlined,
+                          color: AppColors.textPrimary,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // 2. PRODUCT GALLERY CONTAINER (With right thumbnail rail)
+                Expanded(
+                  flex: 11,
+                  child: Container(
+                    clipBehavior: Clip.antiAlias,
+                    decoration: const BoxDecoration(
+                      color: AppColors.textWhite,
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            // 3. DESCRIPTION & SIZE SELECTOR CONTAINER
-            Expanded(
-              flex: 9,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                decoration: const BoxDecoration(
-                  color: AppColors.backgroundCream,
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
-                ),
-                child: AnimateInItem(
-                  index: 0,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppStrings.productName1,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  AppStrings.productName2,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              'Price: €97',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
+                        // 1. MAIN ACTIVE IMAGE VIEWPORT
+                        Positioned.fill(
+                          child: AnimateInItem(
+                            index: 0,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 700),
+                              switchInCurve: Curves.ease,
+                              switchOutCurve: Curves.ease,
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  children: [
+                                    ...previousChildren,
+                                    if (currentChild != null)
+                                      Positioned.fill(child: currentChild),
+                                  ],
+                                );
+                              },
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                    final isIncoming =
+                                        child.key ==
+                                        ValueKey<int>(selectedImageIndex);
+
+                                    final slideTween = isIncoming
+                                        ? const Offset(-1.0, 0.0)
+                                        : const Offset(1.0, 0.0);
+
+                                    return SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: slideTween,
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                              child: Image.network(
+                                productImages[selectedImageIndex],
+                                key: ValueKey<int>(selectedImageIndex),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          AppStrings.selectSize,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary.withValues(alpha: 0.9),
                           ),
                         ),
-                        const SizedBox(height: 10),
 
-                        // Horizontal Size Selection Row
-                        SizedBox(
-                          height: 44,
+                        // 2. VERTICAL THUMBNAIL RAIL
+                        Positioned(
+                          top: 0,
+                          right: 10,
+                          bottom: 0,
+                          width: 60,
                           child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: sizes.length,
+                            itemCount: productImages.length,
+                            padding: const EdgeInsets.only(top: 8, bottom: 8),
+                            physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
-                              final size = sizes[index];
-                              final isSelected = size == selectedSize;
-                              return SizeSelectionButton(isSelected: isSelected, onTap: () => setState(() => selectedSize = size), size: size);
+                              final isCurrent = index == selectedImageIndex;
+                              return ImageSelectionButton(
+                                isSelected: isCurrent,
+                                onTap: () {
+                                  _triggerQuickPopAnimation();
+                                  if (index != selectedImageIndex) {
+                                    setState(() => selectedImageIndex = index);
+                                  }
+                                },
+                                imgLink: productImages[index],
+                              );
                             },
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Description text segment
-                        const Text(
-                          'Celebrate the power and simplicity of the Swoosh. This warm, brushed fleece hoodie is made with some extra room through the shoulders, chest and body for easy comfort and laid-back, nostalgic style.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                            height: 1.4,
-                            letterSpacing: 0.1,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-            // 4. BOTTOM ADD TO CART UTILITY ACTION BUTTON
-            Container(
-              padding: EdgeInsets.only(bottom: bottomPadding + 25, top: 30),
-              height: 85,
-              decoration: const BoxDecoration(
-                color: AppColors.backgroundLightCream,
-                borderRadius: BorderRadius.all(Radius.circular(25)),
-              ),
-              child: const Center(
-                child: Text(
-                  AppStrings.addToCart,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                // 3. DESCRIPTION & SIZE SELECTOR CONTAINER
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                    decoration: const BoxDecoration(
+                      color: AppColors.textWhite,
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
+                    ),
+                    child: AnimateInItem(
+                      index: 0,
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppStrings.productName1,
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      AppStrings.productName2,
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Text(
+                                  'Price: €97',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              AppStrings.selectSize,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary.withValues(
+                                  alpha: 0.9,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Horizontal Size Selection Row
+                            SizedBox(
+                              height: 44,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: sizes.length,
+                                itemBuilder: (context, index) {
+                                  final size = sizes[index];
+                                  final isSelected = size == selectedSize;
+                                  return SizeSelectionButton(
+                                    isSelected: isSelected,
+                                    onTap: () {
+                                      _triggerQuickPopAnimation();
+                                      setState(() => selectedSize = size);
+                                    },
+                                    size: size,
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+
+                            // Description text segment
+                            const Text(
+                              'Celebrate the power and simplicity of the Swoosh. This warm, brushed fleece hoodie is made with some extra room through the shoulders, chest and body for easy comfort and laid-back, nostalgic style.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                                height: 1.4,
+                                letterSpacing: 0.1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 4),
+
+                // 4. BOTTOM ADD TO CART UTILITY ACTION BUTTON
+                Container(
+                  padding: EdgeInsets.only(bottom: bottomPadding + 25, top: 30),
+                  height: 85,
+                  decoration: const BoxDecoration(
+                    color: AppColors.backgroundLightCream,
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      AppStrings.addToCart,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: bottomPadding > 0 ? 0 : 8),
+              ],
             ),
-            SizedBox(height: bottomPadding > 0 ? 0 : 8),
-          ],
+          ),
         ),
       ),
     );

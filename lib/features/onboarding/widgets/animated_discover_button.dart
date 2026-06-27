@@ -70,7 +70,7 @@ class _AnimatedDiscoverButtonState extends State<AnimatedDiscoverButton>
             const Text(
               AppStrings.discoverNow,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
               ),

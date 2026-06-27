@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../core/constants/IconPath/home_icon.dart';
+import '../../../core/constants/IconPath/settings_icon.dart';
 
 class BottomNavBar extends StatelessWidget {
   final double bottomPadding;
@@ -19,9 +21,21 @@ class BottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavIcon(Icons.home_filled, true, AppStrings.navHome),
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CustomPaint(
+              painter: HomeIcon(),
+            ),
+          ),
           _buildNavIcon(Icons.favorite_border, false, AppStrings.navFavorites),
-          _buildNavIcon(Icons.settings_outlined, false, AppStrings.navSettings),
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CustomPaint(
+              painter: SettingsIcon(),
+            ),
+          ),
           _buildNavIcon(Icons.person_outline, false, AppStrings.navProfile),
         ],
       ),
